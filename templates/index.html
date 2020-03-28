@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>pyRD</title>
+</head>
+<body>
+<img src="">
+</body>
+<!--<script type="text/javascript" src="{{ url_for('static', filename='index.js') }}"></script>-->
+<script type="text/javascript">
+const KEY = prompt('Key:')
+
+const img = document.querySelector('img');
+
+var filename = 'undefined' // keep it string
+const loop = () => {
+  fetch(window.location.origin+'/rd', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({__: Date.now(), filename: filename, _key: KEY})
+  }).then(function(response) {
+    let content = response.headers.get('Content-Disposition')
+    //"attachment; filename=bla.png"
+    filename = content.split('=')[1]
+    return response.blob();
+  }).then(function(myBlob) {
+    console.log(myBlob)
+    if (myBlob.size) {
+      var objectURL = URL.createObjectURL(myBlob);
+      img.src = objectURL;        
+    } else {
+      content.log('img not change')
+    }
+  })
+  .catch(() => console.error('Error in fetching the website'));
+}
+
+var setIntervalId = window.setInterval(loop, 1000)
+
+//'click mousemove keypress drag mousewheel mousedown mouseup'
+var postEvent = (payload) => {
+  console.log(payload)
+  payload._key = KEY
+  // construct an HTTP request
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', window.location.origin+'/event_post', true);
+  xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+  // send the collected data as JSON
+  xhr.send(JSON.stringify(payload));
+  xhr.onloadend = function () {
+    // done
+  };
+}
+
+img.addEventListener('click', event => {
+  payload = {
+    'type': event.type,
+    'x': event.clientX,
+    'y': event.clientY
+  }
+  postEvent(payload)
+});
+
+document.onkeydown = (event) => {
+  payload = {
+    'type': event.type,
+    'ctrlKey': event.ctrlKey,
+    'altKey': event.altKey,
+    'shiftKey': event.shiftKey,
+    'key': event.key
+  }
+  postEvent(payload)
+  event.preventDefault()
+} 
+</script>
+
+
+</html>
