@@ -1,7 +1,6 @@
 import io
-from flask import Flask, jsonify, render_template, send_file
-from flask import request
-#from PIL import Image
+from flask import Flask, Response, request, jsonify, render_template
+from werkzeug import FileWrapper
 
 global STATE
 STATE = {}
@@ -24,12 +23,10 @@ def rd():
   else:
     attachment = io.BytesIO(STATE[key]['im'])
 
-  resp = send_file(
-    attachment,
-    attachment_filename=STATE[key]['filename'],
-    mimetype='image/png',
-    as_attachment=True
-  )
+  w = FileWrapper(attachment)
+  resp = Response(w, mimetype='text/plain', direct_passthrough=True)
+  resp.headers['filename'] = STATE[key]['filename']
+  
   return resp
 
 @app.route('/event_post', methods=['POST'])

@@ -16,7 +16,7 @@ const img = document.querySelector('img');
 
 var filename = 'undefined' // keep it string
 const loop = () => {
-  fetch(window.location.origin+'/rd', {
+  fetch('./rd', {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
@@ -24,20 +24,18 @@ const loop = () => {
     },
     body: JSON.stringify({__: Date.now(), filename: filename, _key: KEY})
   }).then(function(response) {
-    let content = response.headers.get('Content-Disposition')
-    //"attachment; filename=bla.png"
-    filename = content.split('=')[1]
+    filename = response.headers.get('filename')
     return response.blob();
   }).then(function(myBlob) {
-    console.log(myBlob)
+    //console.log(myBlob)
     if (myBlob.size) {
       var objectURL = URL.createObjectURL(myBlob);
       img.src = objectURL;        
     } else {
-      content.log('img not change')
+      console.log('img not change')
     }
   })
-  .catch(() => console.error('Error in fetching the website'));
+  .catch((err) => console.error(err));
 }
 
 var setIntervalId = window.setInterval(loop, 500)
@@ -48,7 +46,7 @@ var postEvent = (payload) => {
   payload._key = KEY
   // construct an HTTP request
   var xhr = new XMLHttpRequest();
-  xhr.open('POST', window.location.origin+'/event_post', true);
+  xhr.open('POST', './event_post', true);
   xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
   // send the collected data as JSON
   xhr.send(JSON.stringify(payload));
