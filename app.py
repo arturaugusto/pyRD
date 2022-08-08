@@ -1,6 +1,11 @@
 import io
 from flask import Flask, Response, request, jsonify, render_template
-from werkzeug import FileWrapper
+
+try:
+  from werkzeug.wsgi import FileWrapper
+except Exception as e:
+  from werkzeug import FileWrapper
+
 
 global STATE
 STATE = {}
