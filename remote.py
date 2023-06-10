@@ -124,3 +124,5 @@ if __name__ == "__main__":
     parser.add_argument("addr", help="server addres", type=str)
     parser.add_argument("key", help="acess key", type=str)
     args = parser.parse_args()
+
+    main(args.addr, args.key)
